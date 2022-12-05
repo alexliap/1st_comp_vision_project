@@ -1,0 +1,6 @@
+Every image on the Cifar-10 dataset is represented by a row in each data file (row major order).
+The first 1024(32x32) values represent the red channel, the next 1024 represent the green channel and the final 1024
+represent the blue channel.
+For each subset of 1024 values (red, green, blue) every i-th row of the image is represented by the i-th subset
+of 32 values of the corresponding color channel (i.e. the first 32 entries of a row are the red channel values
+of the first row of the image).
