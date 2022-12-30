@@ -13,14 +13,12 @@ def data_preparation(batch_size = 4096):
 
     x_train = train['data']
     y_train = np.array(train['labels'])
-    # y_train = y_train.reshape(len(y_train), 1)
 
     x_train = torch.from_numpy(x_train).to(torch.float32)
     y_train = torch.from_numpy(y_train).to(torch.float32)
 
     x_test = test['data']
     y_test = np.array(test['labels'])
-    # y_test = y_test.reshape(len(y_test), 1)
 
     x_test = torch.from_numpy(x_test).to(torch.float32)
     y_test = torch.from_numpy(y_test).to(torch.float32)

@@ -1,34 +1,49 @@
 import torch
 from pytorch_lightning import LightningModule
 from torch.nn import Conv2d, Dropout, CrossEntropyLoss, ModuleList, Softmax, Linear, MaxPool2d, Flatten, \
-    MultiLabelSoftMarginLoss, BatchNorm1d
+    BatchNorm1d, Sequential, ReLU, BatchNorm2d
 from torch.optim import Adam, SGD
-import torch.nn.functional as func
 
 
 class nn_model(LightningModule):
     def __init__(self, conv_sizes, linear_sizes, dropout, lr):
         super(nn_model, self).__init__()
         self.save_hyperparameters()
-        self.activ_f = Softmax(dim = 1)
         self.lr = lr
         self.loss_f = CrossEntropyLoss()
-        self.batch_norm = BatchNorm1d(linear_sizes[0])
 
         self.epoch = 0
         self.conv_sizes = conv_sizes
         self.linear_sizes = linear_sizes
-        self.dropout = Dropout(dropout / 100)
-        self.maxpool = MaxPool2d((2, 2))
-        self.flatten = Flatten()
 
-        self.conv_list = ModuleList()
-        for i in range(len(self.conv_sizes) - 1):
-            self.conv_list.append(Conv2d(self.conv_sizes[i], self.conv_sizes[i + 1], 3))
-
-        self.linear_list = ModuleList()
-        for j in range(len(self.linear_sizes) - 1):
-            self.linear_list.append(Linear(self.linear_sizes[j], self.linear_sizes[j + 1]))
+        self.conv_layer_1 = Sequential(Conv2d(self.conv_sizes[0], self.conv_sizes[1], 3),
+                                       BatchNorm2d(self.conv_sizes[1]),
+                                       ReLU(),
+                                       Dropout(dropout))
+        self.conv_layer_2 = Sequential(Conv2d(self.conv_sizes[1], self.conv_sizes[2], 3),
+                                       BatchNorm2d(self.conv_sizes[2]),
+                                       ReLU(),
+                                       Dropout(dropout),
+                                       MaxPool2d((2, 2)))
+        self.conv_layer_3 = Sequential(Conv2d(self.conv_sizes[2], self.conv_sizes[3], 3),
+                                       BatchNorm2d(self.conv_sizes[3]),
+                                       ReLU(),
+                                       Dropout(dropout))
+        self.conv_layer_4 = Sequential(Conv2d(self.conv_sizes[3], self.conv_sizes[4], 3),
+                                       BatchNorm2d(self.conv_sizes[4]),
+                                       ReLU(),
+                                       Dropout(dropout),
+                                       MaxPool2d((2, 2)))
+        self.lin_layer_1 = Sequential(Flatten(),
+                                      BatchNorm1d(self.linear_sizes[0]),
+                                      Linear(self.linear_sizes[0], self.linear_sizes[1]),
+                                      ReLU(),
+                                      Dropout(dropout))
+        self.lin_layer_2 = Sequential(BatchNorm1d(self.linear_sizes[1]),
+                                      Linear(self.linear_sizes[1], self.linear_sizes[2]),
+                                      ReLU(),
+                                      Dropout(dropout),
+                                      Softmax(dim = 1))
 
         self.train_loss_values = []
         self.train_acc = []
@@ -39,17 +54,13 @@ class nn_model(LightningModule):
         self.preds = []
 
     def forward(self, x):
-        for i in range(len(self.conv_list)):
-            x = self.conv_list[i](x)
-            x = self.dropout(func.relu(x))
-            x = self.maxpool(x)
-        x = self.flatten(x)
-        x = self.batch_norm(x)
-        for i in range(len(self.linear_list) - 1):
-            x = self.linear_list[i](x)
-            x = self.dropout(func.relu(x))
-        x = self.linear_list[len(self.linear_list) - 1](x)
-        out = self.activ_f(x)
+
+        x = self.conv_layer_1(x)
+        x = self.conv_layer_2(x)
+        x = self.conv_layer_3(x)
+        x = self.conv_layer_4(x)
+        x = self.lin_layer_1(x)
+        out = self.lin_layer_2(x)
 
         return out
 

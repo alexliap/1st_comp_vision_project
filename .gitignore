@@ -3,3 +3,5 @@
 *.pickle
 /lightning_logs
 /.idea
+/model
+*.jpg

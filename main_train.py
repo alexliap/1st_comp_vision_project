@@ -10,10 +10,10 @@ warnings.filterwarnings("ignore")
 
 train_loader, x_test, y_test = data_preparation(batch_size = 1024)
 
-conv_sizes = [3, 24, 48, 96]
-model = nn_model(conv_sizes = conv_sizes, linear_sizes = [384, 10], dropout = 15, lr = 0.005)
+conv_sizes = [3, 24, 48, 96, 120]
+model = nn_model(conv_sizes = conv_sizes, linear_sizes = [3000, 300, 10], dropout = 0.2, lr = 0.005)
 
-trainer = Trainer(max_epochs = 2, default_root_dir = 'model/')
+trainer = Trainer(max_epochs = 40, default_root_dir = 'model/')
 
 trainer.fit(model, train_loader)
 
