@@ -18,22 +18,20 @@ class nn_model(LightningModule):
 
         self.conv_layer_1 = Sequential(Conv2d(self.conv_sizes[0], self.conv_sizes[1], 3),
                                        BatchNorm2d(self.conv_sizes[1]),
-                                       ReLU(),
-                                       Dropout(dropout))
+                                       ReLU())
         self.conv_layer_2 = Sequential(Conv2d(self.conv_sizes[1], self.conv_sizes[2], 3),
                                        BatchNorm2d(self.conv_sizes[2]),
                                        ReLU(),
-                                       Dropout(dropout),
-                                       MaxPool2d((2, 2)))
+                                       MaxPool2d((2, 2)),
+                                       Dropout(dropout))
         self.conv_layer_3 = Sequential(Conv2d(self.conv_sizes[2], self.conv_sizes[3], 3),
                                        BatchNorm2d(self.conv_sizes[3]),
-                                       ReLU(),
-                                       Dropout(dropout))
+                                       ReLU())
         self.conv_layer_4 = Sequential(Conv2d(self.conv_sizes[3], self.conv_sizes[4], 3),
                                        BatchNorm2d(self.conv_sizes[4]),
                                        ReLU(),
-                                       Dropout(dropout),
-                                       MaxPool2d((2, 2)))
+                                       MaxPool2d((2, 2)),
+                                       Dropout(dropout))
         self.lin_layer_1 = Sequential(Flatten(),
                                       BatchNorm1d(self.linear_sizes[0]),
                                       Linear(self.linear_sizes[0], self.linear_sizes[1]),
@@ -42,8 +40,7 @@ class nn_model(LightningModule):
         self.lin_layer_2 = Sequential(BatchNorm1d(self.linear_sizes[1]),
                                       Linear(self.linear_sizes[1], self.linear_sizes[2]),
                                       ReLU(),
-                                      Dropout(dropout),
-                                      Softmax(dim = 1))
+                                      Dropout(dropout))
 
         self.train_loss_values = []
         self.train_acc = []
